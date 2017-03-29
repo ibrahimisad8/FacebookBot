@@ -156,13 +156,13 @@ function PersistentMenu()
 			        call_to_actions:[
 			            {
 			              type:"postback",
-			              title:"Search Cards",
-			              payload:"search cards"
+			              title:"Winter",
+			              payload:"winter"
 			            },
 			            {
 			              type:"postback",
-			              title:"Create Card",
-			              payload:"create card"
+			              title:"Summer",
+			              payload:"summer"
 			            },
 			            {
 			              type:"postback",
