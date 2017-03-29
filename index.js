@@ -17,6 +17,9 @@ app.get("/", function(req, res) {
 	res.send("Hi I am a chatbot")
 })
 
+/**
+ * Curl | curl -X POST "https://graph.facebook.com/v2.6/me/subscribed_apps?access_token=EAAaMy6zQ2hMBAMuyDhdy4wxmEZCYSNNutgk0lbiOfyGmDXdJZBEAi0e7i4f1EiCuZAkZAnUNx7NHFfdotFyOv8YULMJ7YZBVSUwR8cl25YXzF4ILXxXpM5tV8l192ZCnZA5SoUBZBOkLKZAwfoZCPZBfZCeWw9ArM0qPUF6dFD7p6XE8KwZDZD"
+ */
 let token = "EAAaMy6zQ2hMBAMuyDhdy4wxmEZCYSNNutgk0lbiOfyGmDXdJZBEAi0e7i4f1EiCuZAkZAnUNx7NHFfdotFyOv8YULMJ7YZBVSUwR8cl25YXzF4ILXxXpM5tV8l192ZCnZA5SoUBZBOkLKZAwfoZCPZBfZCeWw9ArM0qPUF6dFD7p6XE8KwZDZD"
 
 // Facebook
@@ -114,33 +117,26 @@ function sendButtonMessage(sender, text)
  */
  function sendGenericMessage(sender){
  	let messageData = {
-					 	  "attachment":{
+				 		"attachment":{
 					      "type":"template",
 					      "payload":{
 					        "template_type":"generic",
 					        "elements":[
 					           {
-					            "title":"Winter",
-					            "image_url":"http://advancedtreecare.ca/images/winter_treecare_newmarket_ontario.png",
-					            "subtitle":"I love winter",
-					            "default_action": {
-					              "type": "web_url",
-					              "url": "https://peterssendreceiveapp.ngrok.io/view?item=103",
-					              "messenger_extensions": true,
-					              "webview_height_ratio": "tall",
-					              "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
-					            },
+					            "title":"Winter!",
+					            "image_url":"http://static2.visitfinland.com/wp-content/uploads/Header_Kaskinen_winter.jpg",
+					            "subtitle":"I love Winter!",
 					            "buttons":[
 					              {
 					                "type":"web_url",
 					                "url":"https://en.wikipedia.org/wiki/Winter",
 					                "title":"More about winter"
-					              }              
+					              },          
 					            ]      
 					          }
 					        ]
 					      }
-					    }
+				    	}
  	}
  	sendRequest(sender, messageData)
  }
