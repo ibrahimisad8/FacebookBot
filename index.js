@@ -1,5 +1,4 @@
 "use strict"
-// Changed again & Slack 
 const express = require("express")
 const bodyParser = require("body-parser")
 const request = require("request")
@@ -22,25 +21,27 @@ app.get("/", function(req, res) {
  */
 let token = "EAAaMy6zQ2hMBAMuyDhdy4wxmEZCYSNNutgk0lbiOfyGmDXdJZBEAi0e7i4f1EiCuZAkZAnUNx7NHFfdotFyOv8YULMJ7YZBVSUwR8cl25YXzF4ILXxXpM5tV8l192ZCnZA5SoUBZBOkLKZAwfoZCPZBfZCeWw9ArM0qPUF6dFD7p6XE8KwZDZD"
 
-// Facebook
+// Facebook : Get Webhook Verification
 app.get('/webhook/',function(req, res){
 	if(req.query['hub.verify_token']=="cardsbotNg"){
 		res.send(req.query['hub.challenge'])
 	}
 	res.send("wrong token")
 })
-
+// Facebook : Start Chating
 app.post('/webhook/',function(req,res){
+	// Persistent Menu
+	PersistentMenu()
+	// Continue Chat
 	let messaging_events = req.body.entry[0].messaging
 	for (let i = 0; i < messaging_events.length; i++){
-		let event = messaging_events[i]
+		let event  = messaging_events[i]
 		let sender = event.sender.id
 		if(event.message && event.message.text)
 		{
 			let text = event.message.text
 			decideMessage(sender, text)
 		}
-
 		if(event.postback){
 			let text = JSON.stringify(event.postback)
 			decideMessage(sender, text)
@@ -140,6 +141,45 @@ function sendButtonMessage(sender, text)
  	}
  	sendRequest(sender, messageData)
  }
+/**
+ * Persisten Menu
+ */
+function PersistentMenu()
+{
+	request({
+	    		url : 'https://graph.facebook.com/v2.6/me/thread_settings',
+	    		qs  : { access_token: token },
+	    		method : 'POST',
+			    json:{
+			        setting_type : "call_to_actions",
+			        thread_state : "existing_thread",
+			        call_to_actions:[
+			            {
+			              type:"postback",
+			              title:"Search Cards",
+			              payload:"search cards"
+			            },
+			            {
+			              type:"postback",
+			              title:"Create Card",
+			              payload:"create card"
+			            },
+			            {
+			              type:"postback",
+			              title:"Talk to a human",
+			              payload:"talk to a human"
+			            }
+			          ]
+			    }
+	}, function(error, response, body) {
+	    console.log(response)
+	    if (error) {
+	        console.log('Error sending messages: ', error)
+	    } else if (response.body.error) {
+	        console.log('Error: ', response.body.error)
+	    }
+	})
+}
 /**
  * Description : Send Request
  */
