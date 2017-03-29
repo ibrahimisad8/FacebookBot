@@ -17,11 +17,11 @@ app.get("/", function(req, res) {
 	res.send("Hi I am a chatbot")
 })
 
-let token = "EAACthPjZB8EQBANSmFTeWW52X2OWf4p9ArBq4L1cpL5AZAR0dyvIcOfyS2eCmElISqIjvi0k3IkslIycMmMUZBbqzxC0pj0ZAtb1TYiKZCGTiSWno9QaOGCTPtbW1QfatZB6VDx6qsd6VizQNcYL85sBIr9JsSOUL4OjrPRZBsnYgZDZD"
+let token = "EAAaMy6zQ2hMBAMuyDhdy4wxmEZCYSNNutgk0lbiOfyGmDXdJZBEAi0e7i4f1EiCuZAkZAnUNx7NHFfdotFyOv8YULMJ7YZBVSUwR8cl25YXzF4ILXxXpM5tV8l192ZCnZA5SoUBZBOkLKZAwfoZCPZBfZCeWw9ArM0qPUF6dFD7p6XE8KwZDZD"
 
 // Facebook
 app.get("/webhook/", function(req, res) {
-	if (req.query["hub.verify_token"] === "noyisama") {
+	if (req.query["hub.verify_token"] === "cardsbotNg") {
 		res.send(req.query["hub.challenge"])
 		//Get Started Page
 		getStarted()
