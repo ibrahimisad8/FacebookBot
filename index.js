@@ -1,215 +1,105 @@
-"use strict"
-// Changed again & Slack 
-const express = require("express")
-const bodyParser = require("body-parser")
-const request = require("request")
+'use strict'
 
-const app = express()
+const express = require("express");
+const request = require("request");
+const bodyParser = require("body-parser");
 
-app.set("port", (process.env.PORT || 5000))
+const app = express();
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.listen((process.env.PORT || 5000));
 
-// Allows us to process the data
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+// Server index page
+app.get("/", function (req, res) {
+  res.send("Deployed!");
+});
 
-// Routes
-app.get("/", function(req, res) {
-	res.send("Hi I am a chatbot")
-})
-
-let token = "EAACthPjZB8EQBANSmFTeWW52X2OWf4p9ArBq4L1cpL5AZAR0dyvIcOfyS2eCmElISqIjvi0k3IkslIycMmMUZBbqzxC0pj0ZAtb1TYiKZCGTiSWno9QaOGCTPtbW1QfatZB6VDx6qsd6VizQNcYL85sBIr9JsSOUL4OjrPRZBsnYgZDZD"
-
-// Facebook
-app.get("/webhook/", function(req, res) {
-	if (req.query["hub.verify_token"] === "noyisama") {
-		res.send(req.query["hub.challenge"])
-		//Get Started Page
-		getStarted()
-	}
-	res.send("Wrong token")
-})
-
-app.post("/webhook/", function (req,res) {
-
-	//Persistent Menu
-	PersistentMenu()
-
-	let messaging_events = req.body.entry[0].messaging
-	for (let i = 0; i < messaging_events.length; i++) {
-		let event = messaging_events[i]
-		let sender = event.sender.id
-		if (event.message && event.message.text) {
-			let text = event.message.text
-			decideMessage(sender, text)
-		}
-
-		if (event.postback) {
-			let text = JSON.stringify(event.postback)
-			decideMessage(sender, text)
-			continue
-		}
-	}
-	res.sendStatus(200)
-})
-
-function decideMessage(sender, text1) {
-	let text = text1.toLowerCase()
-	if (text.includes("summer")) {
-		sendImageMessage(sender)
-	} else if (text.includes("winter")) {
-		sendGenericMessage(sender)
-	} else {
-		sendText(sender, "I like Fall")
-		sendButtonMessage(sender, "What is your favorite season?")
-		// send question
-	}
-}
-
-
-function sendText(sender, text) {
-	let messageData = {text: text}
-	sendRequest(sender, messageData)
-}
-
-function sendButtonMessage(sender, text) {
-	let messageData = {
-		"attachment":{
-      		"type":"template",
-      		"payload":{
-		        "template_type":"button",
-		        "text": text,
-		        "buttons":[
-		          {
-		            "type":"postback",
-		            "title":"Summer",
-		            "payload":"summer"
-		          },
-		          {
-		            "type":"postback",
-		            "title":"Winter",
-		            "payload":"winter"
-		          }
-		        ]
-      		}
-    	}
-	}
-	sendRequest(sender, messageData)
-}
-
-function sendImageMessage(sender) {
-	let messageData = {
-    "attachment":{
-      "type":"image",
-      "payload":{
-        "url":"https://chipsifraternity.files.wordpress.com/2012/05/summer-picture1.jpg"
-      }
-    }
+// Facebook Webhook
+// Used for verification
+app.get("/webhook", function (req, res) {
+  if (req.query["hub.verify_token"] === "Add your token here") {
+    console.log("Verified webhook");
+    res.status(200).send(req.query["hub.challenge"]);
+  } else {
+    console.error("Verification failed. The tokens do not match.");
+    res.sendStatus(403);
   }
-  sendRequest(sender, messageData)
+});
+
+let token = "Add your token here"
+
+
+// All callbacks for Messenger will be POST-ed here
+app.post("/webhook", function (req, res) {
+  // Make sure this is a page subscription
+  if (req.body.object == "page") {
+    // Iterate over each entry
+    // There may be multiple entries if batched
+    req.body.entry.forEach(function(entry) {
+      // Iterate over each messaging event
+      entry.messaging.forEach(function(event) {
+        if (event.postback) {
+          processPostback(event);
+        }
+      });
+    });
+
+    res.sendStatus(200);
+  }
+});
+
+function processPostback(event) {
+  var senderId = event.sender.id;
+  var payload = event.postback.payload;
+  payload = payload.toLowerCase();
+
+  if (payload === "greeting") {
+    // Get user's first name from the User Profile API
+    // and include it in the greeting
+    request({
+      url: "https://graph.facebook.com/v2.6/" + senderId,
+      qs: {
+        access_token: token,
+        fields: "first_name"
+      },
+      method: "GET"
+    }, function(error, response, body) {
+      var greeting = "";
+      if (error) {
+        console.log("Error getting user's name: " +  error);
+      } else {
+        var bodyObj = JSON.parse(body);
+        var name = bodyObj.first_name;
+        greeting = "Hi " + name + ". ";
+      }
+      var message = greeting;
+
+      sendMessage(senderId, {text: message});              
+
+		setTimeout(function() {
+    		sendMessage(senderId, {text: "Welcome to Cards."});
+		}, 1000)
+
+		setTimeout(function() {
+    		sendMessage(senderId, {text: "What would you like to do?"});
+		}, 2000)
+    });
+  }
 }
 
-function sendGenericMessage(sender) {
-	let messageData = {
-		"attachment":{
-	      "type":"template",
-	      "payload":{
-	        "template_type":"generic",
-	        "elements":[
-	           {
-	            "title":"Winter!",
-	            "image_url":"http://static2.visitfinland.com/wp-content/uploads/Header_Kaskinen_winter.jpg",
-	            "subtitle":"I love Winter!",
-	            "buttons":[
-	              {
-	                "type":"web_url",
-	                "url":"https://en.wikipedia.org/wiki/Winter",
-	                "title":"More about winter"
-	              },          
-	            ]      
-	          }
-	        ]
-	      }
-    	}
-	}
-	sendRequest(sender, messageData)
-}
-
-function sendRequest(sender, messageData) {
-	request({
-		url: "https://graph.facebook.com/v2.6/me/messages",
-		qs : {access_token : token},
-		method: "POST",
-		json: {
-			recipient: {id: sender},
-			message: messageData
-		}
-
-	}, function(error, response, body) {
-		if (error) {
-			console.log("sending error")
-		} else if (response.body.error) {
-			console.log("response body error")
-		}
-	})
-
-}
-
-function PersistentMenu(){
- request({
-    url: 'https://graph.facebook.com/v2.6/me/thread_settings',
-    qs: { access_token: token },
-    method: 'POST',
-    json:{
-        setting_type : "call_to_actions",
-        thread_state : "existing_thread",
-        call_to_actions:[
-            {
-              type:"postback",
-              title:"Search Cards",
-              payload:"search cards"
-            },
-            {
-              type:"postback",
-              title:"Create Card",
-              payload:"create card"
-            },
-            {
-              type:"postback",
-              title:"Talk to a human",
-              payload:"talk to a human"
-            }
-          ]
+// sends message to user
+function sendMessage(recipientId, message) {
+  request({
+    url: "https://graph.facebook.com/v2.6/me/messages",
+    qs: {access_token: token},
+    method: "POST",
+    json: {
+      recipient: {id: recipientId},
+      message: message,
     }
-
-}, function(error, response, body) {
-    console.log(response)
+  }, function(error, response, body) {
     if (error) {
-        console.log('Error sending messages: ', error)
-    } else if (response.body.error) {
-        console.log('Error: ', response.body.error)
+      console.log("Error sending message: " + response.error);
     }
-})
-
+  });
 }
-
-function getStarted() {
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/thread_settings',
-    	qs: { access_token: token },
-    	method: 'POST',
-    	json: {
-    		"setting_type":"call_to_actions",
-			"thread_state":"new_thread",
-			"call_to_actions":[
- 				{
- 					"payload":"get started"
- 				}
-			]
-    	}
-	})
-}
-
-
-app.listen(app.get("port"), function() {
-	console.log("running: port")
-})
