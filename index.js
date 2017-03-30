@@ -17,7 +17,7 @@ app.get("/", function (req, res) {
 // Facebook Webhook
 // Used for verification
 app.get("/webhook", function (req, res) {
-  if (req.query["hub.verify_token"] === "Add your token here") {
+  if (req.query["hub.verify_token"] === "cards") {
     console.log("Verified webhook");
     res.status(200).send(req.query["hub.challenge"]);
   } else {
@@ -26,7 +26,7 @@ app.get("/webhook", function (req, res) {
   }
 });
 
-let token = "Add your token here"
+let token = "EAAGMeZA43ZAhkBAMUUTbYGEwIQcZChYFZCUONIT84Xt26iTE8NNETO2AM4PGxpIgUKNyUH3NuvznZBZAVJjibjAbvYYxaRZCb1SLpxkhLufqkZCP7rM4qTL4ZBhP6hdzABWzJyKvVqjoaauBdqPnD2UIYoRBsY76ctTe104xZCZCkVp4AZDZD"
 
 
 // All callbacks for Messenger will be POST-ed here
@@ -76,13 +76,13 @@ function processPostback(event) {
 
       sendMessage(senderId, {text: message});              
 
-		setTimeout(function() {
-    		sendMessage(senderId, {text: "Welcome to Cards."});
-		}, 1000)
+    setTimeout(function() {
+        sendMessage(senderId, {text: "Welcome to Cards."});
+    }, 1000)
 
-		setTimeout(function() {
-    		sendMessage(senderId, {text: "What would you like to do?"});
-		}, 2000)
+    setTimeout(function() {
+        sendMessage(senderId, {text: "What would you like to do?"});
+    }, 2000)
     });
   }
 }
