@@ -41,6 +41,9 @@ app.post("/webhook", function (req, res) {
         if (event.postback) {
           processPostback(event);
         }
+        else if (event.message) {
+          processMessage(event);
+        }
       });
     });
 
@@ -54,9 +57,54 @@ function processPostback(event) {
   payload = payload.toLowerCase();
 
   if (payload === "greeting") {
-    // Get user's first name from the User Profile API
-    // and include it in the greeting
-    request({
+    greeting(senderId);
+  }
+}
+
+function processMessage(event) {
+  var senderId = event.sender.id;
+  var message = event.message;
+
+  if (message.text) {
+    var formattedMsg = message.text.toLowerCase().trim();
+    if (formattedMsg.includes("search cards")){
+      searchCards(senderId);
+    }
+    else if (formattedMsg.includes("create card")){
+      sendMessage(senderId, {text: "Creating card..."});
+    }
+    else if (formattedMsg.includes("talk to a human")){
+      sendMessage(senderId, {text: "Contacting a human..."});
+    }
+  }
+  else if (message.attachments) {
+    sendMessage(senderId, {text: "Sorry, I don't understand your request."});
+  }
+}
+
+// sends message to user
+function sendMessage(recipientId, message) {
+  request({
+    url: "https://graph.facebook.com/v2.6/me/messages",
+    qs: {access_token: token},
+    method: "POST",
+    json: {
+      recipient: {id: recipientId},
+      message: message,
+    }
+  }, function(error, response, body) {
+    if (error) {
+      console.log("Error sending message: " + response.error);
+    }
+  });
+}
+
+
+// Sequences
+function greeting(senderId){
+  // Get user's first name from the User Profile API
+  // and include it in the greeting
+  request({
       url: "https://graph.facebook.com/v2.6/" + senderId,
       qs: {
         access_token: token,
@@ -76,30 +124,85 @@ function processPostback(event) {
 
       sendMessage(senderId, {text: message});              
 
-    setTimeout(function() {
-        sendMessage(senderId, {text: "Welcome to Cards."});
-    }, 1000)
+      setTimeout(function() {
+          sendMessage(senderId, {text: "Welcome to Cards."});
+      }, 1000)
 
-    setTimeout(function() {
-        sendMessage(senderId, {text: "What would you like to do?"});
-    }, 2000)
+      setTimeout(function() {
+          greetingReplies(senderId);
+      }, 2000)
     });
-  }
 }
 
-// sends message to user
-function sendMessage(recipientId, message) {
-  request({
-    url: "https://graph.facebook.com/v2.6/me/messages",
-    qs: {access_token: token},
-    method: "POST",
-    json: {
-      recipient: {id: recipientId},
-      message: message,
-    }
-  }, function(error, response, body) {
-    if (error) {
-      console.log("Error sending message: " + response.error);
-    }
-  });
+function greetingReplies(senderId){
+  let message = {
+    "text":"What would you like to do?",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Search Cards",
+        "payload":"search"
+      },
+      {
+        "content_type":"text",
+        "title":"Create Card",
+        "payload":"create"
+      },
+      {
+        "content_type":"text",
+        "title":"Talk to a human",
+        "payload":"human"
+      }
+    ]
+  }
+  sendMessage(senderId, message);
+}
+
+function searchCards(senderId) {
+  let message = {
+    "text":"Pick a category below or type in exactly what you are looking for.",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"food",
+        "payload":"food"
+      },
+      {
+        "content_type":"text",
+        "title":"fashion",
+        "payload":"fashion"
+      },
+      {
+        "content_type":"text",
+        "title":"shoes",
+        "payload":"shoes"
+      },
+      {
+        "content_type":"text",
+        "title":"travel",
+        "payload":"travel"
+      },
+      {
+        "content_type":"text",
+        "title":"hospitality",
+        "payload":"hospitality"
+      },
+      {
+        "content_type":"text",
+        "title":"entertainment",
+        "payload":"entertainment"
+      },
+      {
+        "content_type":"text",
+        "title":"electronics",
+        "payload":"electronics"
+      },
+      {
+        "content_type":"text",
+        "title":"gifts",
+        "payload":"gifts"
+      }
+    ]
+  }
+  sendMessage(senderId, message);
 }
