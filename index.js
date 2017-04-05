@@ -20,12 +20,11 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
-/*
+/**
  * Be sure to setup your config values before running this code. You can 
  * set them using environment variables 
  *
  */
-
 // Arbitrary value used to validate a webhook
 const VALIDATION_TOKEN = process.env.VALIDATION_TOKEN;
 
