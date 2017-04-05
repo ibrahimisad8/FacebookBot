@@ -79,7 +79,7 @@ function processPostback(event) {
   var payload = event.postback.payload;
   payload = payload.toLowerCase();
 
-  if (payload === "Greeting") {
+  if (payload === "greeting") {
     greeting(senderId);
   }
 }
