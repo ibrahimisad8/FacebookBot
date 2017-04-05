@@ -133,7 +133,7 @@ function greeting(senderId){
   request({
       url: "https://graph.facebook.com/v2.6/" + senderId,
       qs: {
-        access_token: token,
+        access_token: PAGE_ACCESS_TOKEN,
         fields: "first_name"
       },
       method: "GET"
