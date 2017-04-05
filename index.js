@@ -1,23 +1,49 @@
-'use strict'
+/**
+ * Index file
+ * 
+ * This file is important to all pages / files 
+ *
+ * @author Adinoyi Sadiq & Ibrahim Isa
+ * @version 1.0
+ * @link http://www.facebook.com/CardsNg
+ */
 
+// The purpose of "use strict" is to indicate that the code should be executed in "strict mode".
+// With strict mode, you can not, for example, use undeclared variables.
+'use strict'
+// Constants
 const express = require("express");
 const request = require("request");
+const app     = express();
 const bodyParser = require("body-parser");
-
-const app = express();
+// Intialize app use 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
+/*
+ * Be sure to setup your config values before running this code. You can 
+ * set them using environment variables 
+ *
+ */
 
+// Arbitrary value used to validate a webhook
+const VALIDATION_TOKEN = process.env.VALIDATION_TOKEN;
+
+// Generate a page access token for your page from the App Dashboard
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+
+if (!(VALIDATION_TOKEN && PAGE_ACCESS_TOKEN)) {
+  console.error("Missing config values");
+  process.exit(1);
+}
 // Server index page
 app.get("/", function (req, res) {
   res.send("Deployed!");
 });
-
 // Facebook Webhook
 // Used for verification
 app.get("/webhook", function (req, res) {
-  if (req.query["hub.verify_token"] === "cards") {
+  if (req.query["hub.verify_token"] === VALIDATION_TOKEN) {
     console.log("Verified webhook");
     res.status(200).send(req.query["hub.challenge"]);
   } else {
@@ -25,10 +51,6 @@ app.get("/webhook", function (req, res) {
     res.sendStatus(403);
   }
 });
-
-let token = "EAAGMeZA43ZAhkBAMUUTbYGEwIQcZChYFZCUONIT84Xt26iTE8NNETO2AM4PGxpIgUKNyUH3NuvznZBZAVJjibjAbvYYxaRZCb1SLpxkhLufqkZCP7rM4qTL4ZBhP6hdzABWzJyKvVqjoaauBdqPnD2UIYoRBsY76ctTe104xZCZCkVp4AZDZD"
-
-
 // All callbacks for Messenger will be POST-ed here
 app.post("/webhook", function (req, res) {
   // Make sure this is a page subscription
@@ -50,7 +72,9 @@ app.post("/webhook", function (req, res) {
     res.sendStatus(200);
   }
 });
-
+/**
+ * Description : This function processes postback
+ */
 function processPostback(event) {
   var senderId = event.sender.id;
   var payload = event.postback.payload;
@@ -60,7 +84,9 @@ function processPostback(event) {
     greeting(senderId);
   }
 }
-
+/**
+ * Description : This function processes message
+ */
 function processMessage(event) {
   var senderId = event.sender.id;
   var message = event.message;
@@ -81,12 +107,13 @@ function processMessage(event) {
     sendMessage(senderId, {text: "Sorry, I don't understand your request."});
   }
 }
-
-// sends message to user
+/**
+ * Description : Sends message to user
+ */
 function sendMessage(recipientId, message) {
   request({
     url: "https://graph.facebook.com/v2.6/me/messages",
-    qs: {access_token: token},
+    qs: {access_token: PAGE_ACCESS_TOKEN},
     method: "POST",
     json: {
       recipient: {id: recipientId},
@@ -98,9 +125,9 @@ function sendMessage(recipientId, message) {
     }
   });
 }
-
-
-// Sequences
+/**
+ * Description : Processes message Sequences
+ */
 function greeting(senderId){
   // Get user's first name from the User Profile API
   // and include it in the greeting
@@ -117,10 +144,10 @@ function greeting(senderId){
         console.log("Error getting user's name: " +  error);
       } else {
         var bodyObj = JSON.parse(body);
-        var name = bodyObj.first_name;
-        greeting = "Hi " + name + ". ";
+        var name    = bodyObj.first_name;
+        greeting    = "Hi " + name + ". ";
       }
-      var message = greeting;
+      var message   = greeting;
 
       sendMessage(senderId, {text: message});              
 
@@ -133,7 +160,9 @@ function greeting(senderId){
       }, 2000)
     });
 }
-
+/**
+ * Description : Processes Mesage replies 
+ */
 function greetingReplies(senderId){
   let message = {
     "text":"What would you like to do?",
@@ -157,7 +186,9 @@ function greetingReplies(senderId){
   }
   sendMessage(senderId, message);
 }
-
+/**
+ * Description : Processe Cards searching
+ */
 function searchCards(senderId) {
   let message = {
     "text":"Pick a category below or type in exactly what you are looking for.",
