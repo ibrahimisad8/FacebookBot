@@ -19,7 +19,7 @@ const bodyParser = require("body-parser");
 // Set mongoose 
 var mongoose = require("mongoose");
 var db    = mongoose.connect(process.env.MONGODB_URI);
-var Movie = require("./models/movie");
+var Movie = require("./models/movies");
 // Intialize app use 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
