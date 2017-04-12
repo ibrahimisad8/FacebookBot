@@ -88,7 +88,7 @@ function processPostback(event) {
                 greeting    = "Hi " + name + ". ";
              }
              // Message greeting for user
-             var message = greeting + "Welcome to Cards. What can i do for you ?";
+             var message = greeting + "Welcome to Cards";
              // Send Message
              sendMessage(senderId,{text: message});
              // Greting Replies
@@ -97,14 +97,6 @@ function processPostback(event) {
             }, 2000)
         });
     } 
-    else if(payload === "search"){
-        searchCards(senderId);
-    }
-    else if (payload === "create") {
-        sendMessage(senderId, {text: "Awesome! We get back to you in a moment"});
-    } else if (payload === "human") {
-        sendMessage(senderId, {text: "Thank you a human will contact you shortly"});
-    }
 }
 
 function processMessage(event) {
@@ -117,12 +109,18 @@ function processMessage(event) {
 
         // You may get a text or attachment but not both
         if (message.text) {
-            var formattedMsg = message.text.toLowerCase().trim();
+            var checkMsg = message.text.toLowerCase().trim();
 
             // If we receive a text message, check to see if it matches any special
-            // keywords and send back the corresponding movie detail.
-            // Otherwise search for new movie.
-            sendMessage(senderId, {text: "Processing your message "+formattedMsg});
+            // keywords and send back the corresponding detail
+            if(checkMsg.includes("search"))
+            {
+                searchCards(senderId)
+            }
+            else
+            {
+                sendMessage(senderId, {text: "Sorry, I don't understand your request "+checkMsg});
+            }
 
         } else if (message.attachments) {
             sendMessage(senderId, {text: "Sorry, I don't understand your request."});
@@ -141,7 +139,8 @@ function sendMessage(recipientId, message) {
             message: message,
         }
     }, function(error, response, body) {
-        if (error) {
+        if (error) 
+        {
             console.log("Error sending message: " + response.error);
         }
     });
