@@ -3,31 +3,29 @@
  * 
  * This file is important to all pages / files 
  *
- * @author Adinoyi Sadiq & Ibrahim Isa
+ * @author Ibrahim Isa , Adinoyi Sadiq & David
  * @version 1.0
  * @link http://www.facebook.com/CardsNg
  */
 
 // The purpose of "use strict" is to indicate that the code should be executed in "strict mode".
 // With strict mode, you can not, for example, use undeclared variables.
-var express = require("express");
-var request = require("request");
+var express    = require("express");
+var request    = require("request");
+var mongoose   = require("mongoose");
 var bodyParser = require("body-parser");
-var mongoose = require("mongoose");
-
-var db = mongoose.connect(process.env.MONGODB_URI);
+// Database Connection
+var db    = mongoose.connect(process.env.MONGODB_URI);
 var Movie = require("./models/movie");
-
-var app = express();
+// Poert Setting
+var app   = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
-
 // Server index page
 app.get("/", function (req, res) {
     res.send("Deployed!");
 });
-
 // Facebook Webhook
 // Used for verification
 app.get("/webhook", function (req, res) {
@@ -39,7 +37,6 @@ app.get("/webhook", function (req, res) {
         res.sendStatus(403);
     }
 });
-
 // All callbacks for Messenger will be POST-ed here
 app.post("/webhook", function (req, res) {
     // Make sure this is a page subscription
@@ -60,38 +57,53 @@ app.post("/webhook", function (req, res) {
         res.sendStatus(200);
     }
 });
-
+/**
+ * Description : Process Post Back
+ */
 function processPostback(event) {
     var senderId = event.sender.id;
-    var payload = event.postback.payload;
-
+    var payload  = event.postback.payload;
     if (payload === "Greeting") {
-        greeting(senderId);
         // Get user's first name from the User Profile API
         // and include it in the greeting
         request({
-            url: "https://graph.facebook.com/v2.6/" + senderId,
-            qs: {
-                access_token: process.env.PAGE_ACCESS_TOKEN,
-                fields: "first_name"
+            url : "https://graph.facebook.com/v2.6/" + senderId,
+            qs  : {
+                     access_token : process.env.PAGE_ACCESS_TOKEN,
+                     fields : "first_name"
             },
-            method: "GET"
+            method : "GET"
         }, function(error, response, body) {
-            var greeting = "";
-            if (error) {
+            
+             var greeting = "";
+             // Check for errors
+             if (error) 
+             {
                 console.log("Error getting user's name: " +  error);
-            } else {
+             }
+             else 
+             {
                 var bodyObj = JSON.parse(body);
-                name = bodyObj.first_name;
-                greeting = "Hi " + name + ". ";
-            }
-            var message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
-            sendMessage(senderId, {text: message});
+                name        = bodyObj.first_name;
+                greeting    = "Hi " + name + ". ";
+             }
+             // Message greeting for user
+             var message = greeting + "Welcome to Cards. What can i do for you ?";
+             // Send Message
+             sendMessage(senderId,{text: message});
+             // Greting Replies
+             setTimeout(function() {
+                greetingReplies(senderId);
+            }, 2000)
         });
-    } else if (payload === "Correct") {
-        sendMessage(senderId, {text: "Awesome! What would you like to find out? Enter 'plot', 'date', 'runtime', 'director', 'cast' or 'rating' for the various details."});
-    } else if (payload === "Incorrect") {
-        sendMessage(senderId, {text: "Oops! Sorry about that. Try using the exact title of the movie"});
+    } 
+    else if(payload === "search"){
+        searchCards(senderId);
+    }
+    else if (payload === "create") {
+        sendMessage(senderId, {text: "Awesome! We get back to you in a moment"});
+    } else if (payload === "human") {
+        sendMessage(senderId, {text: "Thank you a human will contact you shortly"});
     }
 }
 
@@ -110,90 +122,12 @@ function processMessage(event) {
             // If we receive a text message, check to see if it matches any special
             // keywords and send back the corresponding movie detail.
             // Otherwise search for new movie.
-            switch (formattedMsg) {
-                case "plot":
-                case "date":
-                case "runtime":
-                case "director":
-                case "cast":
-                case "rating":
-                    getMovieDetail(senderId, formattedMsg);
-                    break;
+            sendMessage(senderId, {text: "Processing your message "+formattedMsg});
 
-                default:
-                    findMovie(senderId, formattedMsg);
-            }
         } else if (message.attachments) {
             sendMessage(senderId, {text: "Sorry, I don't understand your request."});
         }
     }
-}
-
-function findMovie(userId, movieTitle) {
-    request("http://www.omdbapi.com/?type=movie&t=" + movieTitle, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var movieObj = JSON.parse(body);
-            if (movieObj.Response === "True") {
-                var query = {user_id: userId};
-                var update = {
-                    user_id: userId,
-                    title: movieObj.Title,
-                    plot: movieObj.Plot,
-                    date: movieObj.Released,
-                    runtime: movieObj.Runtime,
-                    director: movieObj.Director,
-                    cast: movieObj.Actors,
-                    rating: movieObj.imdbRating,
-                    poster_url:movieObj.Poster
-                };
-                var options = {upsert: true};
-                Movie.findOneAndUpdate(query, update, options, function(err, mov) {
-                    if (err) {
-                        console.log("Database error: " + err);
-                    } else {
-                        message = {
-                            attachment: {
-                                type: "template",
-                                payload: {
-                                    template_type: "generic",
-                                    elements: [{
-                                        title: movieObj.Title,
-                                        subtitle: "Is this the movie you are looking for?",
-                                        image_url: movieObj.Poster === "N/A" ? "http://placehold.it/350x150" : movieObj.Poster,
-                                        buttons: [{
-                                            type: "postback",
-                                            title: "Yes",
-                                            payload: "Correct"
-                                        }, {
-                                            type: "postback",
-                                            title: "No",
-                                            payload: "Incorrect"
-                                        }]
-                                    }]
-                                }
-                            }
-                        };
-                        sendMessage(userId, message);
-                    }
-                });
-            } else {
-                console.log(movieObj.Error);
-                sendMessage(userId, {text: movieObj.Error});
-            }
-        } else {
-            sendMessage(userId, {text: "Something went wrong. Try again."});
-        }
-    });
-}
-
-function getMovieDetail(userId, field) {
-    Movie.findOne({user_id: userId}, function(err, movie) {
-        if(err) {
-            sendMessage(userId, {text: "Something went wrong. Try again"});
-        } else {
-            sendMessage(userId, {text: movie[field]});
-        }
-    });
 }
 
 // sends message to user
@@ -210,41 +144,6 @@ function sendMessage(recipientId, message) {
         if (error) {
             console.log("Error sending message: " + response.error);
         }
-    });
-}
-/**
- * Description : Processes message Sequences
- */
-function greeting(senderId){
-  // Get user's first name from the User Profile API
-  // and include it in the greeting
-  request({
-      url: "https://graph.facebook.com/v2.6/" + senderId,
-      qs: {
-        access_token: process.env.PAGE_ACCESS_TOKEN,
-        fields: "first_name"
-      },
-      method: "GET"
-    }, function(error, response, body) {
-      var greeting = "";
-      if (error) {
-        console.log("Error getting user's name: " +  error);
-      } else {
-        var bodyObj = JSON.parse(body);
-        var name    = bodyObj.first_name;
-        greeting    = "Hi " + name + ". ";
-      }
-      var message   = greeting;
-
-      sendMessage(senderId, {text: message});              
-
-      setTimeout(function() {
-          sendMessage(senderId, {text: "Welcome to Cards."});
-      }, 1000)
-
-      setTimeout(function() {
-          greetingReplies(senderId);
-      }, 2000)
     });
 }
 /**
