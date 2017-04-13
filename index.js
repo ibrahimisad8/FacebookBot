@@ -140,7 +140,7 @@ function processMessage(event) {
             }
             else if(checkMsg.includes("food")||checkMsg.includes("shoes")||checkMsg.includes("travel"))
             {
-              cardsData(senderId);
+              CardsData(senderId);
             }
             else
             {
