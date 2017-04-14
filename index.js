@@ -26,27 +26,6 @@ app.listen((process.env.PORT || 5000));
 app.get("/", function (req, res) {
     res.send("Deployed!");
 });
-/*/ Var Data - Base
-var cardsData = [
-                  {"Business Name":"Hib Soft Solutions","name":"Ibrahim Isa","email":"ibrahimd8@yahoo.com","web":"www.iblynks.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"Engineer","ImageUrl":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png"},
-                  
-                  {"Business Name":"Sadiq Travels","name":"Sadiq Adinoyi","email":"sadiq@yahoo.com","web":"www.sadiq.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"travel","ImageUrl":"http://travelfashiongirl.com/wp-content/uploads/2016/12/best-travel-shoes-cover.jpg"},
-                  
-                  {"Business Name":"David shoes & Accesories","name":"David John","email":"david@yahoo.com","web":"www.david.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"shoes","ImageUrl":"https://static.pexels.com/photos/19090/pexels-photo.jpg"},
-                  
-                  {"Business Name":"","name":"Robbart Monoma","email":"robbart@yahoo.com","web":"www.robbart.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"designer","ImageUrl":"https://i.ytimg.com/vi/6nTKbT8JybQ/maxresdefault.jpg"},
-                  
-                  {"Business Name":"","name":"Zainab","email":"zainab@yahoo.com","web":"www.zainab.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"travel","ImageUrl":"http://crisscrosstvl.com/wp-content/uploads/2016/05/sunset-plane.png"},
-                  
-                  {"Business Name":"","name":"Abba Sulieman","email":"abba@yahoo.com","web":"www.abba.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"Food","ImageUrl":"https://images7.alphacoders.com/368/368875.jpg"},
-                  
-                  {"Business Name":"","name":"Sanusi Ismaila","email":"sanusi@yahoo.com","web":"www.sanusi.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"shoes","ImageUrl":"https://s-media-cache-ak0.pinimg.com/originals/e8/6c/ef/e86cef21233114bb6a7fa665462cd56d.jpg"},
-                  
-                  {"Business Name":"","name":"Ifeanyi Moh","email":"ifeanyi@yahoo.com","web":"www.ifeanyi.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"travel","ImageUrl":"https://2xd7m81yfswf20bam1231iux-wpengine.netdna-ssl.com/wp-content/uploads/2014/08/Santorini_iStock_000039729572_Full-1-2000x1250.jpg"},
-                  
-                  {"Business Name":"","name":"Musa Kenedy","email":"musa@yahoo.com","web":"www.musa.com","phone":"07068869376","Address":"D6 Garbja Abdulkadir Road Ungwan Rimi","Service":"Food","ImageUrl":"https://s3.amazonaws.com/htw/dt-contest-entries/73034/germany-restaurant-beer-food-beverage-bar-wine-Beef-logo-design.png"},
-
-                ];*/
 // Facebook Webhook
 // Used for verification
 app.get("/webhook", function (req, res) {
@@ -112,6 +91,8 @@ function processPostback(event) {
              var message = greeting + "Welcome to Cards";
              // Send Message
              sendMessage(senderId,{text: message});
+             // Try Corsel
+             CardsData(senderId);
              // Greting Replies
              setTimeout(function() {
                 greetingReplies(senderId);
