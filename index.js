@@ -256,5 +256,5 @@ function searchCards(senderId) {
                     }
                   }
       };
-      sendRequest(sender, messageData);
+      sendRequest(senderId, messageData);
  }
