@@ -249,7 +249,7 @@ function searchCards(senderId) {
                                                                                           "title":"View Website"
                                                                                         }             
                                                                                       ]      
-                                                                        },
+                                                                        }/*,
                                                                         {
                                                                             "title":"Hib Soft Solutions",
                                                                             "image_url":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
@@ -280,7 +280,7 @@ function searchCards(senderId) {
                                                                                           "title":"View Website"
                                                                                         }             
                                                                                       ]      
-                                                                        }
+                                                                        }*/
                                                                       ]
                                                          }                                               
                                               }
