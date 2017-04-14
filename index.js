@@ -227,8 +227,7 @@ function searchCards(senderId) {
  */
  function CardsData(senderId)
  {
-    let message = {"message":{
-                              "attachment":{
+    let message = {"attachment":{
                                               "type":"template",
                                               "payload":{ "template_type":"generic",
                                                           "elements":[
@@ -286,7 +285,6 @@ function searchCards(senderId) {
                                                          }                                               
                                               }
                             } 
-                    }
     // Send Message
     sendMessage(senderId, message);
  }
