@@ -138,7 +138,7 @@ function processMessage(event) {
             {
                 searchCards(senderId)
             }
-            else if(checkMsg.includes("food")||checkMsg.includes("shoes")||checkMsg.includes("travel"))
+            else if(checkMsg.includes("food"))
             {
               CardsData(senderId);
             }
