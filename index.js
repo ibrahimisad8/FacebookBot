@@ -227,64 +227,34 @@ function searchCards(senderId) {
  */
  function CardsData(senderId)
  {
-    let message = {"attachment":{
-                                              "type":"template",
-                                              "payload":{ "template_type":"generic",
-                                                          "elements":[
-                                                                        {
-                                                                            "title":"Welcome to Peter\'s Shoes",
-                                                                            "image_url":"https://static.pexels.com/photos/19090/pexels-photo.jpg",
-                                                                            "subtitle" :"We\'ve got the right hat for everyone.",
-                                                                            "default_action": {
-                                                                            "type": "web_url",
-                                                                            "url" : "https://peterssendreceiveapp.ngrok.io/view?item=103",
-                                                                            "messenger_extensions": true,
-                                                                            "webview_height_ratio": "tall",
-                                                                            "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
-                                                                                             },
-                                                                            "buttons":[
-                                                                                        {
-                                                                                          "type":"web_url",
-                                                                                          "url":"https://petersfancybrownhats.com",
-                                                                                          "title":"View Website"
-                                                                                        }             
-                                                                                      ]      
-                                                                        }/*,
-                                                                        {
-                                                                            "title":"Hib Soft Solutions",
-                                                                            "image_url":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
-                                                                            "subtitle" :"Software & Hardware Engineer. 34 Slack Road , Tel:07068869376",
-                                                                            "default_action": {
-                                                                            "type": "web_url",
-                                                                            "url" : "https://peterssendreceiveapp.ngrok.io/view?item=103",
-                                                                            "messenger_extensions": true,
-                                                                            "webview_height_ratio": "tall",
-                                                                            "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
-                                                                                             },
-                                                                            "buttons":[
-                                                                                        {
-                                                                                          "type":"web_url",
-                                                                                          "url":"https://iblynks.com",
-                                                                                          "title":"View Website"
-                                                                                        }             
-                                                                                      ]      
-                                                                        },
-                                                                        {
-                                                                            "title":"Sadiq Travels",
-                                                                            "image_url":"http://travelfashiongirl.com/wp-content/uploads/2016/12/best-travel-shoes-cover.jpg",
-                                                                            "subtitle" :"Professional Travel Agents. D5 Washinton DC, Tel:+1284740373",
-                                                                            "buttons":[
-                                                                                        {
-                                                                                          "type":"web_url",
-                                                                                          "url":"https://iblynks.com",
-                                                                                          "title":"View Website"
-                                                                                        }             
-                                                                                      ]      
-                                                                        }*/
-                                                                      ]
-                                                         }                                               
-                                              }
-                            } 
-    // Send Message
-    sendMessage(senderId, message);
+      let messageData = {
+                  "attachment":{
+                    "type":"template",
+                    "payload":{
+                      "template_type":"generic",
+                      "elements":[
+                         {
+                          "title":"Winter",
+                          "image_url":"http://advancedtreecare.ca/images/winter_treecare_newmarket_ontario.png",
+                          "subtitle":"I love winter",
+                          "default_action": {
+                            "type": "web_url",
+                            "url": "https://peterssendreceiveapp.ngrok.io/view?item=103",
+                            "messenger_extensions": true,
+                            "webview_height_ratio": "tall",
+                            "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
+                          },
+                          "buttons":[
+                            {
+                              "type":"web_url",
+                              "url":"https://en.wikipedia.org/wiki/Winter",
+                              "title":"More about winter"
+                            }              
+                          ]      
+                        }
+                      ]
+                    }
+                  }
+      };
+      sendRequest(sender, messageData);
  }
