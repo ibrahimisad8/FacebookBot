@@ -50,17 +50,18 @@ app.post('/webhook/',function(req,res){
     }
     if(event.postback){
       let text = JSON.stringify(event.postback)
-      decideMessage(sender, text)
+      let payload = event.postback.payload
+      decideMessage(sender, text, payload)
       continue
     }
   }
   res.sendStatus(200)
 })
 
-function decideMessage(sender, text1)
+function decideMessage(sender, text1, payload)
 {
   let text = text1.toLowerCase()
-  if(text.includes("greeting"))
+  if(text.includes("greeting") || payload === "greeting")
   {
         Greetings(sender);
   }
