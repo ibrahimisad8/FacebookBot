@@ -50,8 +50,7 @@ app.post('/webhook/',function(req,res){
     }
     if(event.postback){
       let text = JSON.stringify(event.postback)
-      let payload = event.postback.payload
-      decideMessage(sender, text, payload)
+      decideMessage(sender, text)
       continue
     }
   }
@@ -61,9 +60,9 @@ app.post('/webhook/',function(req,res){
 function decideMessage(sender, text1, payload)
 {
   let text = text1.toLowerCase()
-  if(text.includes("greeting") || payload === "greeting")
+  if(text.includes("greeting"))
   {
-        Greetings(sender);
+        Greetings(sender)
   }
   else if(text.includes("summer")){
     sendImageMessage(sender)
