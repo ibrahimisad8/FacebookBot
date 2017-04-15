@@ -64,9 +64,9 @@ function decideMessage(sender, text1, payload)
   {
         Greetings(sender)
   }
-  else if(text.includes("summer")){
+  else if(text.includes("food")){
     sendImageMessage(sender)
-  }else if(text.includes("winter")){
+  }else if(text.includes("shoes")){
     sendGenericMessage(sender)
   }else{
     sendText(sender, "Thank you for using cards ! :-)")
@@ -101,15 +101,11 @@ function Greetings(sender)
               greeting    = "Hi " + name + ". ";
             }
             // Message greeting for user
-            var message = greeting + "Welcome to Cards I like Fall";
+            var message = greeting + "Welcome to Cards";
             // Send Message
             sendText(sender,message);
             // Send Button
-            sendButtonMessage(sender, "what is your favourite season")
-            /*/ Greting Replies
-            setTimeout(function() {
-                greetingReplies(senderId);
-            }, 2000)*/
+            sendButtonMessage(sender, "please select an option")
   });
 
 }
@@ -135,13 +131,13 @@ function sendButtonMessage(sender, text)
                         "buttons":[
                           {
                             "type"    : "postback",
-                            "title"   : "Summer",
-                            "payload" : "summer"
+                            "title"   : "Food",
+                            "payload" : "food"
                           },
                           {
                             "type"    : "postback",
-                            "title"   : "Winter",
-                            "payload" : "winter"
+                            "title"   : "Shoes",
+                            "payload" : "shoes"
                           }]
                         }
               }
@@ -157,7 +153,7 @@ function sendButtonMessage(sender, text)
               "attachment":{
                         "type":"image",
                         "payload":{ 
-                              "url":"http://cdn.hercampus.com/s3fs-public/2015/06/22/Summer_2015.jpg"
+                              "url":"https://images7.alphacoders.com/368/368875.jpg"
                                                 }
                            }
   }
@@ -174,26 +170,38 @@ function sendButtonMessage(sender, text)
                   "template_type":"generic",
                   "elements":[
                      {
-                      "title":"Winter!",
-                      "image_url":"http://static2.visitfinland.com/wp-content/uploads/Header_Kaskinen_winter.jpg",
-                      "subtitle":"I love Winter!",
+                      "title":"Sadiq Foot wears",
+                      "image_url":"https://static.pexels.com/photos/19090/pexels-photo.jpg",
+                      "subtitle":"D6 Barnawa Kaduna Nigeria ",
                       "buttons":[
                         {
                           "type":"web_url",
-                          "url":"https://en.wikipedia.org/wiki/Winter",
-                          "title":"More about winter"
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
                         },          
                       ]      
                     },
                     {
-                      "title":"Winter!",
-                      "image_url":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
-                      "subtitle":"I love Travel",
+                      "title":"David Designs",
+                      "image_url":"https://s-media-cache-ak0.pinimg.com/originals/e8/6c/ef/e86cef21233114bb6a7fa665462cd56d.jpg",
+                      "subtitle":"44 Commila Baracks Kaduna Nigeria ",
                       "buttons":[
                         {
                           "type":"web_url",
-                          "url":"https://en.wikipedia.org/wiki/Winter",
-                          "title":"More about winter"
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
+                        },          
+                      ]      
+                    },
+                    {
+                      "title":"Zara",
+                      "image_url":"http://www.runnersworld.com/sites/runnersworld.com/files/styles/slideshow-desktop/public/saucony_hurricane_iso2_w_400.jpg?itok=G5sUl5fb",
+                      "subtitle":"Lagos Nigeria Ikeja ",
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
                         },          
                       ]      
                     }
