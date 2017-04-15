@@ -104,7 +104,7 @@ function Greetings(sender)
             // Message greeting for user
             var message = greeting + "Welcome to Cards I like Fall";
             // Send Message
-            sendText(senderId,{text: message});
+            sendText(sender,message);
             // Send Button
             sendButtonMessage(sender, "what is your favourite season")
             /*/ Greting Replies
