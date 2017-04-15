@@ -10,232 +10,220 @@
 
 // The purpose of "use strict" is to indicate that the code should be executed in "strict mode".
 // With strict mode, you can not, for example, use undeclared variables.
-var express    = require("express");
-var request    = require("request");
-var mongoose   = require("mongoose");
-var bodyParser = require("body-parser");
-// Database Connection
-var db    = mongoose.connect(process.env.MONGODB_URI);
-var Movie = require("./models/movie");
-// Poert Setting
-var app   = express();
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
-app.listen((process.env.PORT || 5000));
-// Server index page
-app.get("/", function (req, res) {
-    res.send("Deployed!");
-});
-// Facebook Webhook
-// Used for verification
-app.get("/webhook", function (req, res) {
-    if (req.query["hub.verify_token"] === process.env.VERIFICATION_TOKEN) {
-        console.log("Verified webhook");
-        res.status(200).send(req.query["hub.challenge"]);
-    } else {
-        console.error("Verification failed. The tokens do not match.");
-        res.sendStatus(403);
-    }
-});
-// All callbacks for Messenger will be POST-ed here
-app.post("/webhook", function (req, res) {
-    // Make sure this is a page subscription
-    if (req.body.object == "page") {
-        // Iterate over each entry
-        // There may be multiple entries if batched
-        req.body.entry.forEach(function(entry) {
-            // Iterate over each messaging event
-            entry.messaging.forEach(function(event) {
-                if (event.postback) {
-                    processPostback(event);
-                } else if (event.message) {
-                    processMessage(event);
-                }
-            });
-        });
+const express    = require("express")
+const bodyParser = require("body-parser")
+const request    = require("request")
 
-        res.sendStatus(200);
+const app = express()
+
+app.set("port", (process.env.PORT || 5000))
+
+// Allows us to process the data
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+
+// Routes
+app.get("/", function(req, res) {
+  res.send("Hi I am a chatbot")
+})
+
+
+let token = process.env.PAGE_ACCESS_TOKEN
+// Facebook : Get Webhook Verification
+app.get('/webhook/',function(req, res){
+  if(req.query['hub.verify_token']==process.env.VERIFICATION_TOKEN){
+    res.send(req.query['hub.challenge'])
+  }
+  res.send("wrong token")
+})
+// Facebook : Start Chating
+app.post('/webhook/',function(req,res){
+  // Continue Chat
+  let messaging_events = req.body.entry[0].messaging
+  for (let i = 0; i < messaging_events.length; i++){
+    let event  = messaging_events[i]
+    let sender = event.sender.id
+    if(event.message && event.message.text)
+    {
+      let text = event.message.text
+      decideMessage(sender, text)
     }
-});
-/**
- * Description : Process Post Back
- */
-function processPostback(event) {
-    var senderId = event.sender.id;
-    var payload  = event.postback.payload;
-    if (payload === "Greeting") {
-        // Get user's first name from the User Profile API
-        // and include it in the greeting
-        request({
-            url : "https://graph.facebook.com/v2.6/" + senderId,
+    if(event.postback){
+      let text = JSON.stringify(event.postback)
+      decideMessage(sender, text)
+      continue
+    }
+  }
+  res.sendStatus(200)
+})
+
+function decideMessage(sender, text1)
+{
+  let text = text1.toLowerCase()
+  if(text.includes("greeting"))
+  {
+        Greetings(sender);
+  }
+  else if(text.includes("summer")){
+    sendImageMessage(sender)
+  }else if(text.includes("winter")){
+    sendGenericMessage(sender)
+  }else{
+    sendText(sender, "Thank you for using cards ! :-)")
+  }
+}
+ /**
+  * Gretings
+  */
+function Greetings(sender)
+{
+  // Get user's first name from the User Profile API
+  // and include it in the greeting
+  request({
+            url : "https://graph.facebook.com/v2.6/" + sender,
             qs  : {
                      access_token : process.env.PAGE_ACCESS_TOKEN,
                      fields : "first_name"
             },
             method : "GET"
-        }, function(error, response, body) {
+  }, function(error, response, body) {
             
-             var greeting = "";
-             // Check for errors
-             if (error) 
-             {
-                console.log("Error getting user's name: " +  error);
-             }
-             else 
-             {
-                var bodyObj = JSON.parse(body);
-                name        = bodyObj.first_name;
-                greeting    = "Hi " + name + ". ";
-             }
-             // Message greeting for user
-             var message = greeting + "Welcome to Cards";
-             // Send Message
-             sendMessage(senderId,{text: message});
-             // Try Corsel
-             CardsData(senderId);
-             // Greting Replies
-             setTimeout(function() {
+            var greeting = "";
+            // Check for errors
+            if (error) 
+            {
+               console.log("Error getting user's name: " +  error);
+            }
+            else 
+            {
+              var bodyObj = JSON.parse(body);
+              name        = bodyObj.first_name;
+              greeting    = "Hi " + name + ". ";
+            }
+            // Message greeting for user
+            var message = greeting + "Welcome to Cards I like Fall";
+            // Send Message
+            sendText(senderId,{text: message});
+            // Send Button
+            sendButtonMessage(sender, "what is your favourite season")
+            /*/ Greting Replies
+            setTimeout(function() {
                 greetingReplies(senderId);
-            }, 2000)
-        });
-    } 
-}
+            }, 2000)*/
+  });
 
-function processMessage(event) {
-    if (!event.message.is_echo) {
-        var message = event.message;
-        var senderId = event.sender.id;
-
-        console.log("Received message from senderId: " + senderId);
-        console.log("Message is: " + JSON.stringify(message));
-
-        // You may get a text or attachment but not both
-        if (message.text) {
-            var checkMsg = message.text.toLowerCase().trim();
-
-            // If we receive a text message, check to see if it matches any special
-            // keywords and send back the corresponding detail
-            if(checkMsg.includes("search"))
-            {
-                searchCards(senderId)
-            }
-            else if(checkMsg.includes("food"))
-            {
-              CardsData(senderId);
-            }
-            else
-            {
-                sendMessage(senderId, {text: "Sorry, I don't understand your request -> "+checkMsg+".Please pick one"});
-                searchCards(senderId);
-            }
-
-        } else if (message.attachments) {
-            sendMessage(senderId, {text: "Sorry, I don't understand your request."});
-        }
-    }
-}
-// sends message to user
-function sendMessage(recipientId, message) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: recipientId},
-            message: message,
-        }
-    }, function(error, response, body) {
-        if (error) 
-        {
-            console.log("Error sending message: " + response.error);
-        }
-    });
 }
 /**
- * Description : Processes Mesage replies 
+ * Description : Send Text Message
  */
-function greetingReplies(senderId){
-  let message = {
-    "text":"What would you like to do?",
-    "quick_replies":[
-      {
-        "content_type":"text",
-        "title":"Search Cards",
-        "payload":"search"
-      },
-      {
-        "content_type":"text",
-        "title":"Create Card",
-        "payload":"create"
-      },
-      {
-        "content_type":"text",
-        "title":"Talk to a human",
-        "payload":"human"
-      }
-    ]
-  }
-  sendMessage(senderId, message);
+function sendText(sender, text)
+{
+  let messageData = {text: text}
+  sendRequest(sender, messageData)
 }
 /**
- * Description : Processe Cards searching
+ * Description : Send Button Message
  */
-function searchCards(senderId) {
-  let message = {
-    "text":"Pick a category below or type in exactly what you are looking for.",
-    "quick_replies":[
-      {
-        "content_type":"text",
-        "title":"food",
-        "payload":"food"
-      },
-      {
-        "content_type":"text",
-        "title":"shoes",
-        "payload":"shoes"
-      },
-      {
-        "content_type":"text",
-        "title":"travel",
-        "payload":"travel"
-      }
-    ]
-  }
-  sendMessage(senderId, message);
-}
-/**
- * Description : CardsData
- */
- function CardsData(senderId)
- {
-      let messageData = {
-                  "attachment":{
-                    "type":"template",
-                    "payload":{
-                      "template_type":"generic",
-                      "elements":[
-                         {
-                          "title":"Winter",
-                          "image_url":"http://advancedtreecare.ca/images/winter_treecare_newmarket_ontario.png",
-                          "subtitle":"I love winter",
-                          "default_action": {
-                            "type": "web_url",
-                            "url": "https://peterssendreceiveapp.ngrok.io/view?item=103",
-                            "messenger_extensions": true,
-                            "webview_height_ratio": "tall",
-                            "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
+function sendButtonMessage(sender, text)
+{
+  let messageData = {
+        "attachment":{
+                  "type":"template",
+                  "payload":{
+                        "template_type":"button",
+                        "text": text,
+                        "buttons":[
+                          {
+                            "type"    : "postback",
+                            "title"   : "Summer",
+                            "payload" : "summer"
                           },
-                          "buttons":[
-                            {
-                              "type":"web_url",
-                              "url":"https://en.wikipedia.org/wiki/Winter",
-                              "title":"More about winter"
-                            }              
-                          ]      
+                          {
+                            "type"    : "postback",
+                            "title"   : "Winter",
+                            "payload" : "winter"
+                          }]
                         }
-                      ]
-                    }
-                  }
-      };
-      sendMessage(senderId, messageData);
+              }
+  }
+  sendRequest(sender, messageData)
+}
+/**
+ * Description : Send Image Message
+ */
+ function sendImageMessage(sender)
+ {
+  let messageData = {
+              "attachment":{
+                        "type":"image",
+                        "payload":{ 
+                              "url":"http://cdn.hercampus.com/s3fs-public/2015/06/22/Summer_2015.jpg"
+                                                }
+                           }
+  }
+  sendRequest(sender, messageData)
  }
+/**
+ * Description : Send Generic Message
+ */
+ function sendGenericMessage(sender){
+  let messageData = {
+            "attachment":{
+                "type":"template",
+                "payload":{
+                  "template_type":"generic",
+                  "elements":[
+                     {
+                      "title":"Winter!",
+                      "image_url":"http://static2.visitfinland.com/wp-content/uploads/Header_Kaskinen_winter.jpg",
+                      "subtitle":"I love Winter!",
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/wiki/Winter",
+                          "title":"More about winter"
+                        },          
+                      ]      
+                    },
+                    {
+                      "title":"Winter!",
+                      "image_url":"ImageUrl":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
+                      "subtitle":"I love Travel",
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/wiki/Winter",
+                          "title":"More about winter"
+                        },          
+                      ]      
+                    }
+                  ]
+                }
+              }
+  }
+  sendRequest(sender, messageData)
+ }
+/**
+ * Description : Send Request
+ */
+ function sendRequest(sender, messageData){
+    request({
+    url    : "https://graph.facebook.com/v2.6/me/messages",
+    qs     : {access_token : token},
+    method : "POST",
+    json   : {
+           recipient : {id: sender},
+           message   : messageData
+             }
+  }, function(error, response, body){
+    if(error) {
+      console.log("sending error")
+    }else if(response.body.error){
+      console.log("response body error")
+    }
+  })
+ }
+
+app.listen(app.get('port'), function(){
+  console.log("running: port")
+})
