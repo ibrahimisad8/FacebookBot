@@ -187,7 +187,7 @@ function sendButtonMessage(sender, text)
                     },
                     {
                       "title":"Winter!",
-                      "image_url":"ImageUrl":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
+                      "image_url":"https://d125fmws0bore1.cloudfront.net/assets/udacity_share-46db4b8faf075a5af5a1070a7fa0ad3639783609ff45f447e4ea467fe3aa9d32.png",
                       "subtitle":"I love Travel",
                       "buttons":[
                         {
