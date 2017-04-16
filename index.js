@@ -115,7 +115,7 @@ function Greetings(sender)
             sendText(sender,message);
              // Greting Replies
              setTimeout(function() {
-                greetingReplies(senderId);
+                greetingReplies(sender);
             }, 2000);
   });
 
@@ -198,7 +198,7 @@ function sendText(sender, text)
  /**
   * Description : Processes Mesage replies 
   */
-function greetingReplies(senderId){
+function greetingReplies(sender){
   let message = {
     "text":"What would you like to do?",
     "quick_replies":[
@@ -219,12 +219,12 @@ function greetingReplies(senderId){
       }
     ]
   }
-  sendMessage(senderId, message);
+ sendRequest(sender, message);
 }
 /**
  * Description : Processe Cards searching
  */
-function searchCards(senderId) {
+function searchCards(sender) {
   let message = {
     "text":"Pick a category below or type in exactly what you are looking for.",
     "quick_replies":[
@@ -245,7 +245,7 @@ function searchCards(senderId) {
       }
     ]
   }
-  sendMessage(senderId, message);
+ sendRequest(sender, message);
 }
 /**
  * Description : Send Request
