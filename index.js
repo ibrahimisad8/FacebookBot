@@ -10,24 +10,20 @@
 
 // The purpose of "use strict" is to indicate that the code should be executed in "strict mode".
 // With strict mode, you can not, for example, use undeclared variables.
-const express    = require("express")
-const bodyParser = require("body-parser")
-const request    = require("request")
-
-const app = express()
-
+const express    = require("express");
+const bodyParser = require("body-parser");
+const request    = require("request");
+const app        = express();
+// Set Port
 app.set("port", (process.env.PORT || 5000))
-
 // Allows us to process the data
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-
 // Routes
 app.get("/", function(req, res) {
   res.send("Hi I am a chatbot")
 })
-
-
+// Set token
 let token = process.env.PAGE_ACCESS_TOKEN
 // Facebook : Get Webhook Verification
 app.get('/webhook/',function(req, res){
@@ -56,20 +52,33 @@ app.post('/webhook/',function(req,res){
   }
   res.sendStatus(200)
 })
-
+/**
+ * Description : Decide Message
+ */
 function decideMessage(sender, text1, payload)
 {
-  let text = text1.toLowerCase()
+  // message text
+  let text = text1.toLowerCase();
+  // Check text
   if(text.includes("greeting"))
   {
-        Greetings(sender)
+      Greetings(sender);
   }
-  else if(text.includes("food")){
-    sendImageMessage(sender)
-  }else if(text.includes("shoes")){
-    sendGenericMessage(sender)
-  }else{
-    sendText(sender, "Thank you for using cards ! :-)")
+  else if(text.includes("search"))
+  {
+      searchCards(sender); 
+  }
+  else if(text.includes("food"))
+  {
+      sendImageMessage(sender);
+  }
+  else if(text.includes("shoes"))
+  {
+      sendGenericMessage(sender);
+  }
+  else
+  {
+    sendText(sender, "Thank you for using cards ! :-)");
   }
 }
  /**
@@ -104,8 +113,10 @@ function Greetings(sender)
             var message = greeting + "Welcome to Cards";
             // Send Message
             sendText(sender,message);
-            // Send Button
-            sendButtonMessage(sender, "please select an option")
+             // Greting Replies
+             setTimeout(function() {
+                greetingReplies(senderId);
+            }, 2000);
   });
 
 }
@@ -115,33 +126,6 @@ function Greetings(sender)
 function sendText(sender, text)
 {
   let messageData = {text: text}
-  sendRequest(sender, messageData)
-}
-/**
- * Description : Send Button Message
- */
-function sendButtonMessage(sender, text)
-{
-  let messageData = {
-        "attachment":{
-                  "type":"template",
-                  "payload":{
-                        "template_type":"button",
-                        "text": text,
-                        "buttons":[
-                          {
-                            "type"    : "postback",
-                            "title"   : "Food",
-                            "payload" : "food"
-                          },
-                          {
-                            "type"    : "postback",
-                            "title"   : "Shoes",
-                            "payload" : "shoes"
-                          }]
-                        }
-              }
-  }
   sendRequest(sender, messageData)
 }
 /**
@@ -211,6 +195,58 @@ function sendButtonMessage(sender, text)
   }
   sendRequest(sender, messageData)
  }
+ /**
+  * Description : Processes Mesage replies 
+  */
+function greetingReplies(senderId){
+  let message = {
+    "text":"What would you like to do?",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"Search Cards",
+        "payload":"search"
+      },
+      {
+        "content_type":"text",
+        "title":"Create Card",
+        "payload":"create"
+      },
+      {
+        "content_type":"text",
+        "title":"Talk to a human",
+        "payload":"human"
+      }
+    ]
+  }
+  sendMessage(senderId, message);
+}
+/**
+ * Description : Processe Cards searching
+ */
+function searchCards(senderId) {
+  let message = {
+    "text":"Pick a category below or type in exactly what you are looking for.",
+    "quick_replies":[
+      {
+        "content_type":"text",
+        "title":"food",
+        "payload":"food"
+      },
+      {
+        "content_type":"text",
+        "title":"shoes",
+        "payload":"shoes"
+      },
+      {
+        "content_type":"text",
+        "title":"travel",
+        "payload":"travel"
+      }
+    ]
+  }
+  sendMessage(senderId, message);
+}
 /**
  * Description : Send Request
  */
