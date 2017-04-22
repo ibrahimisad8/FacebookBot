@@ -15,7 +15,7 @@ var bodyParser = require("body-parser");
 var request    = require("request");
 var mongoose   = require("mongoose");
 // Connect to Mognodb-Mlab Database
-var db  = mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI);
 // Set schema
 var ButDetails = mongoose.Schema({
        type : String,
@@ -167,18 +167,25 @@ function sendText(sender, text)
  */
  function sendGenericMessage(sender){
 
-  CardsModel.find({},function(err, foundData){
-        var messageData = {
-            "attachment":{
-                "type":"template",
-                "payload":{
-                  "template_type":"generic",
-                  "elements":foundData
+    CardsModel.find({},function(err, foundData){
+      if(foundData.length == 0)
+      {
+         var messageData = 'Sorry Please try  again !'
+      }
+      else
+      {
+         var messageData = {
+               "attachment":{
+                  "type":"template",
+                  "payload":{
+                    "template_type":"generic",
+                    "elements":foundData
+                  }
                 }
-              }
-            };
-     sendRequest(sender, messageData);
-  });
+        };
+      }
+       sendRequest(sender, messageData);
+    });
   
  }
  /**
