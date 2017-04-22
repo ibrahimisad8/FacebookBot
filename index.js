@@ -17,20 +17,18 @@ var mongoose   = require("mongoose");
 // Connect to Mognodb-Mlab Database
 var db  = mongoose.connect(process.env.MONGODB_URI);
 // Set schema
-var ButDetails = mongoose.Schema({
-       type : String,
-       url : String,
-       title : String          
-});
-var ObjSchema = mongoose.Schema({
-    category : String,
-    title : String,
-    image_url : String,
-    subtitle : String,
-    buttons : [ButDetails]
+var mySchema = mongoose.schema({
+              Business_name : {type: String},
+              name  : {type: String},
+              email : {type: String},
+              web   : {type: String},
+              phone : {type: String},
+              address  : {type: String},
+              service  : {type: String},
+              ImageUrl : {type: String}
 });
 // Cards Model
-var CardsModel = mongoose.model('newcards',ObjSchema);
+var CardsModel = mongoose.model('cards',mySchema);
 // App express js
 var app = express();
 // Set Port
@@ -166,50 +164,53 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
-
-  /*CardsModel.find({},function(err, foundData){
-    
-        let messageData = {
+  let messageData = {
             "attachment":{
-                "type":"template",
-                "payload":{
-                  "template_type":"generic",
-                  "elements":foundData
-                }
-              }
-            }
-
-  });*/
-        let messageData = {
-              "attachment":{
                 "type":"template",
                 "payload":{
                   "template_type":"generic",
                   "elements":[
                      {
-                      "title":"Winter",
-                      "image_url":"http://advancedtreecare.ca/images/winter_treecare_newmarket_ontario.png",
-                      "subtitle":"I love winter",
-                      "default_action": {
-                        "type": "web_url",
-                        "url": "https://peterssendreceiveapp.ngrok.io/view?item=103",
-                        "messenger_extensions": true,
-                        "webview_height_ratio": "tall",
-                        "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
-                      },
+                      "title":"Sadiq Foot wears",
+                      "image_url":"https://static.pexels.com/photos/19090/pexels-photo.jpg",
+                      "subtitle":"D6 Barnawa Kaduna Nigeria ",
                       "buttons":[
                         {
                           "type":"web_url",
-                          "url":"https://en.wikipedia.org/wiki/Winter",
-                          "title":"More about winter"
-                        }              
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
+                        },          
+                      ]      
+                    },
+                    {
+                      "title":"David Designs",
+                      "image_url":"https://s-media-cache-ak0.pinimg.com/originals/e8/6c/ef/e86cef21233114bb6a7fa665462cd56d.jpg",
+                      "subtitle":"44 Commila Baracks Kaduna Nigeria ",
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
+                        },          
+                      ]      
+                    },
+                    {
+                      "title":"Zara",
+                      "image_url":"http://www.runnersworld.com/sites/runnersworld.com/files/styles/slideshow-desktop/public/saucony_hurricane_iso2_w_400.jpg?itok=G5sUl5fb",
+                      "subtitle":"Lagos Nigeria Ikeja ",
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/",
+                          "title":"Learn More"
+                        },          
                       ]      
                     }
                   ]
                 }
               }
-            }
-  sendRequest(sender, messageData);
+  }
+  sendRequest(sender, messageData)
  }
  /**
   * Description : Processes Mesage replies 
