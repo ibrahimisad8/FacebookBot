@@ -14,21 +14,6 @@ var express    = require("express");
 var bodyParser = require("body-parser");
 var request    = require("request");
 var mongoose   = require("mongoose");
-// Connect to Mognodb-Mlab Database
-var db  = mongoose.connect(process.env.MONGODB_URI);
-// Set schema
-var mySchema = mongoose.schema({
-              Business_name : {type: String},
-              name  : {type: String},
-              email : {type: String},
-              web   : {type: String},
-              phone : {type: String},
-              address  : {type: String},
-              service  : {type: String},
-              ImageUrl : {type: String}
-});
-// Cards Model
-var CardsModel = mongoose.model('cards',mySchema);
 // App express js
 var app = express();
 // Set Port
