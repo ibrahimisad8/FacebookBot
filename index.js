@@ -166,15 +166,14 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
-
     CardsModel.find({},function(err, foundData){
       if(foundData.length == 0)
       {
-         var messageData = 'Sorry Please try  again !'
+         let messageData = 'Sorry Please try  again !'
       }
       else
       {
-         var messageData = {
+         let messageData = {
                "attachment":{
                   "type":"template",
                   "payload":{
