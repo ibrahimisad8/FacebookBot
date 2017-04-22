@@ -168,7 +168,7 @@ function sendText(sender, text)
  function sendGenericMessage(sender){
 
   CardsModel.find({},function(err, foundData){
-        let messageData = {
+        var messageData = {
             "attachment":{
                 "type":"template",
                 "payload":{
