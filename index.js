@@ -169,21 +169,7 @@ function sendText(sender, text)
 
   CardsModel.find({},function(err, foundData){
     
-        if(foundData.length == 0)
-        {
-              var responseObject = {"message" : "No Data founs" };
-
-              res.status(400).send(responseObject);
-          }
-          else
-          {
-
-            var responseObject = {"message" : "Data Found" };
-
-            res.send(responseObject);
-          }
-
-        var messageData = {
+        /*let messageData = {
             "attachment":{
                 "type":"template",
                 "payload":{
@@ -191,8 +177,36 @@ function sendText(sender, text)
                   "elements":foundData
                 }
               }
+            }*/
+      let messageData = {
+              "attachment":{
+                "type":"template",
+                "payload":{
+                  "template_type":"generic",
+                  "elements":[
+                     {
+                      "title":"Winter",
+                      "image_url":"http://advancedtreecare.ca/images/winter_treecare_newmarket_ontario.png",
+                      "subtitle":"I love winter",
+                      "default_action": {
+                        "type": "web_url",
+                        "url": "https://peterssendreceiveapp.ngrok.io/view?item=103",
+                        "messenger_extensions": true,
+                        "webview_height_ratio": "tall",
+                        "fallback_url": "https://peterssendreceiveapp.ngrok.io/"
+                      },
+                      "buttons":[
+                        {
+                          "type":"web_url",
+                          "url":"https://en.wikipedia.org/wiki/Winter",
+                          "title":"More about winter"
+                        }              
+                      ]      
+                    }
+                  ]
+                }
+              }
             }
-
       sendRequest(sender, messageData);
   });
  }
