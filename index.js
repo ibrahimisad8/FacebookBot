@@ -169,6 +169,20 @@ function sendText(sender, text)
 
   CardsModel.find({},function(err, foundData){
     
+        if(foundData.length == 0)
+        {
+              var responseObject = {"message" : "No Data founs" };
+
+              res.status(400).send(responseObject);
+          }
+          else
+          {
+
+            var responseObject = {"message" : "Data Found" };
+
+            res.send(responseObject);
+          }
+
         var messageData = {
             "attachment":{
                 "type":"template",
