@@ -14,6 +14,23 @@ var express    = require("express");
 var bodyParser = require("body-parser");
 var request    = require("request");
 var mongoose   = require("mongoose");
+// Connect to Mognodb-Mlab Database
+var db  = mongoose.connect(process.env.MONGODB_URI);
+// Set schema
+var ButDetails = mongoose.Schema({
+       type : String,
+       url : String,
+       title : String          
+});
+var ObjSchema = mongoose.Schema({
+    category : String,
+    title : String,
+    image_url : String,
+    subtitle : String,
+    buttons : [ButDetails]
+});
+// Cards Model
+var CardsModel = mongoose.model('newcards',ObjSchema);
 // App express js
 var app = express();
 // Set Port
@@ -149,53 +166,20 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
-  let messageData = {
+
+  CardsModel.find({},function(err, foundData){
+        let messageData = {
             "attachment":{
                 "type":"template",
                 "payload":{
                   "template_type":"generic",
-                  "elements":[
-                     {
-                      "title":"Sadiq Foot wears",
-                      "image_url":"https://static.pexels.com/photos/19090/pexels-photo.jpg",
-                      "subtitle":"D6 Barnawa Kaduna Nigeria ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    },
-                    {
-                      "title":"David Designs",
-                      "image_url":"https://s-media-cache-ak0.pinimg.com/originals/e8/6c/ef/e86cef21233114bb6a7fa665462cd56d.jpg",
-                      "subtitle":"44 Commila Baracks Kaduna Nigeria ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    },
-                    {
-                      "title":"Zara",
-                      "image_url":"http://www.runnersworld.com/sites/runnersworld.com/files/styles/slideshow-desktop/public/saucony_hurricane_iso2_w_400.jpg?itok=G5sUl5fb",
-                      "subtitle":"Lagos Nigeria Ikeja ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    }
-                  ]
+                  "elements":foundData
                 }
               }
-  }
-  sendRequest(sender, messageData)
+            };
+     sendRequest(sender, messageData);
+  });
+  
  }
  /**
   * Description : Processes Mesage replies 
