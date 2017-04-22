@@ -207,8 +207,8 @@ function sendText(sender, text)
                 }
               }
             }
-      sendRequest(sender, messageData);
   });
+  sendRequest(sender, messageData);
  }
  /**
   * Description : Processes Mesage replies 
