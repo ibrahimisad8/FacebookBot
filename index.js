@@ -10,20 +10,39 @@
 
 // The purpose of "use strict" is to indicate that the code should be executed in "strict mode".
 // With strict mode, you can not, for example, use undeclared variables.
-const express    = require("express");
-const bodyParser = require("body-parser");
-const request    = require("request");
-const app        = express();
+var express    = require("express");
+var bodyParser = require("body-parser");
+var request    = require("request");
+var mongoose   = require("mongoose");
+// Connect to Mognodb-Mlab Database
+var db  = mongoose.connect(process.env.MONGODB_URI);
+// Set schema
+var ButDetails = mongoose.Schema({
+       type : String,
+       url : String,
+       title : String          
+});
+var ObjSchema = mongoose.Schema({
+    category : String,
+    title : String,
+    image_url : String,
+    subtitle : String,
+    buttons : [ButDetails]
+});
+// Cards Model
+var CardsModel = mongoose.model('newcards',ObjSchema);
+// App express js
+var app = express();
 // Set Port
 app.set("port", (process.env.PORT || 5000))
 // Allows us to process the data
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-// Routes
+// Routes : Deployment
 app.get("/", function(req, res) {
-  res.send("Hi I am a chatbot")
+  res.send("Chatbot Deplyed !")
 })
-// Set token
+// Route : Set token
 let token = process.env.PAGE_ACCESS_TOKEN
 // Facebook : Get Webhook Verification
 app.get('/webhook/',function(req, res){
@@ -32,7 +51,7 @@ app.get('/webhook/',function(req, res){
   }
   res.send("wrong token")
 })
-// Facebook : Start Chating
+// Routes : Facebook - Start Chating
 app.post('/webhook/',function(req,res){
   // Continue Chat
   let messaging_events = req.body.entry[0].messaging
@@ -147,53 +166,21 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
-  let messageData = {
+
+  CardsModel.find({},function(err, foundData){
+    
+        var messageData = {
             "attachment":{
                 "type":"template",
                 "payload":{
                   "template_type":"generic",
-                  "elements":[
-                     {
-                      "title":"Sadiq Foot wears",
-                      "image_url":"https://static.pexels.com/photos/19090/pexels-photo.jpg",
-                      "subtitle":"D6 Barnawa Kaduna Nigeria ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    },
-                    {
-                      "title":"David Designs",
-                      "image_url":"https://s-media-cache-ak0.pinimg.com/originals/e8/6c/ef/e86cef21233114bb6a7fa665462cd56d.jpg",
-                      "subtitle":"44 Commila Baracks Kaduna Nigeria ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    },
-                    {
-                      "title":"Zara",
-                      "image_url":"http://www.runnersworld.com/sites/runnersworld.com/files/styles/slideshow-desktop/public/saucony_hurricane_iso2_w_400.jpg?itok=G5sUl5fb",
-                      "subtitle":"Lagos Nigeria Ikeja ",
-                      "buttons":[
-                        {
-                          "type":"web_url",
-                          "url":"https://en.wikipedia.org/",
-                          "title":"Learn More"
-                        },          
-                      ]      
-                    }
-                  ]
+                  "elements":foundData
                 }
               }
-  }
-  sendRequest(sender, messageData)
+            }
+
+      sendRequest(sender, messageData);
+  });
  }
  /**
   * Description : Processes Mesage replies 
@@ -247,6 +234,13 @@ function searchCards(sender) {
   }
  sendRequest(sender, message);
 }
+/**
+ * Description : db search cards
+ */
+ function dbSearchCards()
+ {
+
+ }
 /**
  * Description : Send Request
  */
