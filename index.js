@@ -167,9 +167,9 @@ function sendText(sender, text)
  */
  function sendGenericMessage(sender){
 
-  CardsModel.find({},function(err, foundData){
+  /*CardsModel.find({},function(err, foundData){
     
-        /*let messageData = {
+        let messageData = {
             "attachment":{
                 "type":"template",
                 "payload":{
@@ -177,8 +177,10 @@ function sendText(sender, text)
                   "elements":foundData
                 }
               }
-            }*/
-      let messageData = {
+            }
+
+  });*/
+        let messageData = {
               "attachment":{
                 "type":"template",
                 "payload":{
@@ -207,7 +209,6 @@ function sendText(sender, text)
                 }
               }
             }
-  });
   sendRequest(sender, messageData);
  }
  /**
