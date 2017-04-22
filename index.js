@@ -166,10 +166,14 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
-    CardsModel.find({},function(err, foundData){
-      if(foundData.length == 0)
+    var usersProjection = { 
+      _id : false,
+      category : false
+    };
+    CardsModel.find({},usersProjection,function(err, foundData){
+      if(err)
       {
-         let messageData = 'Sorry Please try  again !'
+          console.log("Database error: " + err);
       }
       else
       {
