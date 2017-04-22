@@ -166,10 +166,12 @@ function sendText(sender, text)
  * Description : Send Generic Message
  */
  function sendGenericMessage(sender){
+    
     var usersProjection = { 
       _id : false,
       category : false
     };
+
     CardsModel.find({},usersProjection,function(err, foundData){
       if(err)
       {
@@ -178,16 +180,16 @@ function sendText(sender, text)
       else
       {
          let messageData = {
-               "attachment":{
-                  "type":"template",
-                  "payload":{
-                    "template_type":"generic",
-                    "elements":foundData
-                  }
-                }
-        };
+               "attachment" : {
+                                "type":"template",
+                                "payload" : {
+                                  "template_type":"generic",
+                                  "elements":foundData
+                                }
+                              }
+                           };
+        sendRequest(sender, messageData);
       }
-       sendRequest(sender, messageData);
     });
   
  }
