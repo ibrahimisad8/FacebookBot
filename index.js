@@ -894,8 +894,8 @@ function processMessage(event) {
       searchCards(senderId);
     }
     else if (formattedMsg.includes("create card")){
-      sendMessage(senderId, {text: "Creating card..."});
       CreateCardDave(senderId);
+      sendMessage(senderId, {text: "Creating card..."});
     }
     else if (formattedMsg.includes("people")){
       sendMessage(senderId, {text: "Choose from these categories."});
