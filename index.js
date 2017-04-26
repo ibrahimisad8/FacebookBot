@@ -895,6 +895,7 @@ function processMessage(event) {
     }
     else if (formattedMsg.includes("create card")){
       sendMessage(senderId, {text: "Creating card..."});
+      CreateCardDave(senderId);
     }
     else if (formattedMsg.includes("people")){
       sendMessage(senderId, {text: "Choose from these categories."});
@@ -2281,3 +2282,34 @@ function products_Fashion_and_Design_for_women(senderId) {
     });
   
  }
+ /**
+  * Create Cards
+  */
+  function CreateCardDave(senderId){
+  let message = {
+    "attachment":{
+      "type":"template",
+      "payload":{
+        "template_type":"generic",
+        "elements":[
+           {
+            "title":"Basic Card",
+            "image_url":"https://petersfancybrownhats.com/company_image.png",
+            "subtitle":"Create a card for your personal use",
+            "buttons":[
+              {
+                "type":"web_url",
+                "title":"Get Card",
+                "url":"https://web-pages.herokuapp.com/index.php",
+                "webview_height_ratio": "tall",
+                "messenger_extensions": true,  
+                "fallback_url": "https://web-pages.herokuapp.com/index.php"
+              }              
+            ]      
+          }
+        ]
+      }
+    }
+    }
+    sendMessage(senderId, message);
+}
