@@ -14,8 +14,27 @@
 // Constants
 const express = require("express");
 const request = require("request");
-const app     = express();
 const bodyParser = require("body-parser");
+var mongoose   = require("mongoose");
+// Connect to Mognodb-Mlab Database
+mongoose.connect(process.env.MONGODB_URI);
+// Set schema
+var ButDetails = mongoose.Schema({
+       type : String,
+       url : String,
+       title : String          
+});
+var ObjSchema = mongoose.Schema({
+    category : String,
+    title : String,
+    image_url : String,
+    subtitle : String,
+    buttons : [ButDetails]
+});
+// Cards Model
+var CardsModel = mongoose.model('newcards',ObjSchema);
+// App Express Js
+const app      = express();
 // Intialize app use 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -95,9 +114,11 @@ function processPostback(event) {
 
     
   else if (payload === "companies music and audio") {
-    /*
-  get cards from the database
-    */
+    /**
+     * get cards from the database
+     */
+    SearchCardsDatabase(senderId);
+    // Set timeout
     setTimeout(function() {
           searchCards(senderId);
     }, 1000)
@@ -2228,3 +2249,35 @@ function products_Fashion_and_Design_for_women(senderId) {
   }
   sendMessage(senderId, message);
 }
+/**
+ * Description : Search Cards Database
+ */
+ function SearchCardsDatabase(senderId){
+    
+    var usersProjection = { 
+      _id : false,
+      category : false
+    };
+
+    CardsModel.find({},usersProjection,function(err, foundData){
+      if(err)
+      {
+          console.log("Database error: " + err);
+      }
+      else
+      {
+         let messageData = {
+               "attachment" : {
+                                "type":"template",
+                                "payload" : {
+                                  "template_type":"generic",
+                                  "elements":foundData
+                                }
+                              }
+                           };
+                           
+        sendMessage(senderId, messageData);
+      }
+    });
+  
+ }
